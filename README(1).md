@@ -3257,6 +3257,7 @@ Interval            : 10 seoconds
 Success             : 200
 ```
 
+Burada kaldım 2. ders sonu
 * Create Application Load Balancer with name of `call-rancher-alb` using `call-rke-alb-sg` security group with following settings and add `call-rancher-http-80-tg` target group to it.
 
 ```text
@@ -3362,7 +3363,7 @@ kubectl create namespace cattle-system
 ```bash
 helm install rancher rancher-latest/rancher \
   --namespace cattle-system \
-  --set hostname=rancher.clarusway.us \
+  --set hostname=rancher.rmznkhrmn.com \
   --set tls=external \
   --set replicas=1
 ```
