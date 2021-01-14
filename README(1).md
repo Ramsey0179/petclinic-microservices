@@ -3414,7 +3414,7 @@ git checkout release
 git branch feature/msp-26
 git checkout feature/msp-26
 ```
-
+burdayım 1.33dak
 * Create a Jenkins Job and name it as `create-ecr-docker-registry-for-petclinic-staging` to create Docker Registry for `Staging` manually on AWS ECR.
 
 ``` bash
