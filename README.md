@@ -160,7 +160,7 @@ git branch feature/msp-4
 git checkout feature/msp-4
 ```
 
-* Prepare a script to package the application with maven wrapper and save it as `package-with-mvn-wrapper.sh`.
+* Prepare a script to package the application with maven wrapper and save it as `package-with-mvn-wrapper.sh` under `petclinic-microservices` folder.
 
 ``` bash
 ./mvnw clean package
@@ -376,7 +376,7 @@ git branch feature/msp-7
 git checkout feature/msp-7
 ```
 
-* Prepare a script to build the docker images and save it as `build-dev-docker-images.sh`.
+* Prepare a script to build the docker images and save it as `build-dev-docker-images.sh` under `petclinic-microservices` folder.
 
 ``` bash
 ./mvnw clean package
@@ -425,7 +425,7 @@ git branch feature/msp-8
 git checkout feature/msp-8
 ```
 
-* Prepare docker compose file to deploy the application locally and save it as `docker-compose-local.yml`.
+* Prepare docker compose file to deploy the application locally and save it as `docker-compose-local.yml` under `petclinic-microservices` folder.
 
 ``` yaml
 version: '2'
@@ -540,7 +540,7 @@ services:
     - 9091:9090
 ```
 
-* Prepare a script to test the deployment of the app locally with `docker-compose-local.yml` and save it as `test-local-deployment.sh`.
+* Prepare a script to test the deployment of the app locally with `docker-compose-local.yml` and save it as `test-local-deployment.sh` under `petclinic-microservices` folder.
 
 ``` bash
 docker-compose -f docker-compose-local.yml up
@@ -3192,9 +3192,9 @@ git checkout feature/msp-23
 
   * Inbound rules;
 
-    * Allow TCP on port 80 from Application Load Balancer.
+    * Allow HTTP protocol (TCP on port 80) from Application Load Balancer.
 
-    * Allow TCP on port 443 from any source that needs to use Rancher UI or API.
+    * Allow HTTPS protocol (TCP on port 443) from any source that needs to use Rancher UI or API.
 
     * Allow TCP on port 6443 from any source that needs to use Kubernetes API server(ex. Jenkins Server).
   
@@ -3204,7 +3204,7 @@ git checkout feature/msp-23
 
     * Allow SSH on port 22 to any node IP from a node created using Node Driver.
 
-    * Allow TCP on port 443 to `35.160.43.145/32`, `35.167.242.46/32`, `52.33.59.17/32` for catalogs of `git.rancher.io`.
+    * Allow HTTPS protocol (TCP on port 443) to `35.160.43.145/32`, `35.167.242.46/32`, `52.33.59.17/32` for catalogs of `git.rancher.io`.
 
     * Allow TCP on port 2376 to any node IP from a node created using Node Driver for Docker machine TLS port.
 
@@ -3257,7 +3257,6 @@ Interval            : 10 seoconds
 Success             : 200
 ```
 
-Burada kaldım 2. ders sonu
 * Create Application Load Balancer with name of `call-rancher-alb` using `call-rke-alb-sg` security group with following settings and add `call-rancher-http-80-tg` target group to it.
 
 ```text
@@ -3363,7 +3362,7 @@ kubectl create namespace cattle-system
 ```bash
 helm install rancher rancher-latest/rancher \
   --namespace cattle-system \
-  --set hostname=rancher.rmznkhrmn.com \
+  --set hostname=rancher.clarusway.us \
   --set tls=external \
   --set replicas=1
 ```
@@ -3391,20 +3390,6 @@ SSH User          : rancher
 Label             : os=rancheros
 ```
 
-* Create a Kubernetes cluster using Rancher with RKE and new nodes in AWS (on one EC2 instance only) and name it as `petclinic-cluster`.
-
-```text
-Cluster Type      : Amazon EC2
-Name Prefix       : petclinic-k8s-instance
-Count             : 1
-etcd              : checked
-Control Plane     : checked
-Worker            : checked
-```
-
-* Create `petclinic-staging-ns` and `petclinic-prod-ns` namespaces on `petclinic-cluster` with Rancher.
-
-
 ## MSP 26 - Prepare a Staging Pipeline
 
 * Create `feature/msp-26` branch from `release`.
@@ -3414,7 +3399,20 @@ git checkout release
 git branch feature/msp-26
 git checkout feature/msp-26
 ```
-burdayım 1.33dak
+
+* Create a Kubernetes cluster using Rancher with RKE and new nodes in AWS  and name it as `petclinic-cluster-staging`.
+
+```text
+Cluster Type      : Amazon EC2
+Name Prefix       : petclinic-k8s-instance
+Count             : 3
+etcd              : checked
+Control Plane     : checked
+Worker            : checked
+```
+
+* Create `petclinic-staging-ns` namespace on `petclinic-cluster-staging` with Rancher.
+
 * Create a Jenkins Job and name it as `create-ecr-docker-registry-for-petclinic-staging` to create Docker Registry for `Staging` manually on AWS ECR.
 
 ``` bash
@@ -3606,11 +3604,24 @@ git branch feature/msp-27
 git checkout feature/msp-27
 ```
 
+* Create a Kubernetes cluster using Rancher with RKE and new nodes in AWS (on one EC2 instance only) and name it as `petclinic-cluster`.
+
+```text
+Cluster Type      : Amazon EC2
+Name Prefix       : petclinic-k8s-instance
+Count             : 3
+etcd              : checked
+Control Plane     : checked
+Worker            : checked
+```
+
+* Create `petclinic-prod-ns` namespace on `petclinic-cluster` with Rancher.
+
 * Create a Jenkins Job and name it as `create-ecr-docker-registry-for-petclinic-prod` to create Docker Registry for `Production` manually on AWS ECR.
 
 ``` bash
 PATH="$PATH:/usr/local/bin"
-APP_REPO_NAME="ramsey-repo/petclinic-app-prod"
+APP_REPO_NAME="clarusway-repo/petclinic-app-prod"
 AWS_REGION="us-east-1"
 
 aws ecr create-repository \
@@ -3793,11 +3804,12 @@ git checkout feature/msp-28
 
 * Create an `A` record of `petclinic.clarusway.us` in your hosted zone (in our case `clarusway.us`) using AWS Route 53 domain registrar and bind it to your `petclinic cluster`.
 
-* Configure TLS(SSL) certificate for `petclinic.clarusway.us` using `cert-manager` on petclinic K8s cluster.
+* Configure TLS(SSL) certificate for `petclinic.clarusway.us` using `cert-manager` on petclinic K8s cluster with the following steps.
 
 * Log into Jenkins Server and configure the `kubectl` to connect to petclinic cluster by getting the `Kubeconfig` file from Rancher and save it as `$HOME/.kube/config` or set `KUBECONFIG` environment variable.
 
 ```bash
+#create petclinic-config file under home folder(/home/ec2-user).
 nano petclinic-config
 # paste the content of kubeconfig file and save it.
 chmod 400 petclinic-config
@@ -3811,10 +3823,10 @@ kubectl get ns
   * Create the namespace for cert-manager
 
   ```bash
-  kubectl create namespace cert-manager
+    kubectl create namespace cert-manager
   ```
 
-  * Add the Jetstack Helm repository
+  * Add the Jetstack Helm reposito
 
   ```bash
   helm repo add jetstack https://charts.jetstack.io
@@ -3836,9 +3848,9 @@ kubectl get ns
 
   ```bash
   helm install \
-    cert-manager jetstack/cert-manager \
-    --namespace cert-manager \
-    --version v1.0.4
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --version v1.0.4
   ```
 
   * Verify that the cert-manager is deployed correctly.
@@ -3872,7 +3884,7 @@ spec:
           class: nginx
 ```
 
-* Apply and check if `ClusterIssuer` resource is created.
+* Check if `ClusterIssuer` resource is created.
 
 ```bash
 export KUBECONFIG="$HOME/petclinic-config"
@@ -3906,6 +3918,9 @@ git checkout master
 git merge feature/msp-28
 git push origin master
 ```
+
+* Run the `Production Pipeline` `petclinic-prod` on Jenkins manually to examine the petclinic application.
+
 
 ## MSP 29 - Monitoring with Prometheus and Grafana
 
