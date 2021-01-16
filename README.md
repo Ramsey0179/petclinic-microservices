@@ -3902,7 +3902,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - petclinic.clarusway.us
+    - petclinic.rmznkhrmn.com
     secretName: petclinic-tls
 ```
 
